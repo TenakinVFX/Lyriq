@@ -1,0 +1,1001 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Lyriq</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0b10;
+    --surface: #15121a;
+    --surface2: #1e1926;
+    --border: #2e2838;
+    --accent: #c8a96e;
+    --accent2: #9b6dff;
+    --text: #e8e0f0;
+    --muted: #7a6e8a;
+    --danger: #ff6b6b;
+    --tag1: #9b6dff22;
+    --tag1b: #9b6dff;
+    --tag2: #c8a96e22;
+    --tag2b: #c8a96e;
+    --tag3: #6dcfff22;
+    --tag3b: #6dcfff;
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘DM Mono’, monospace;
+font-size: 14px;
+height: 100dvh;
+display: flex;
+flex-direction: column;
+overflow: hidden;
+}
+
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.04’/%3E%3C/svg%3E”);
+pointer-events: none;
+z-index: 9999;
+opacity: 0.5;
+}
+
+header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 14px 18px 10px;
+border-bottom: 1px solid var(–border);
+background: var(–bg);
+flex-shrink: 0;
+}
+
+.logo {
+font-family: ‘Playfair Display’, serif;
+font-size: 22px;
+font-weight: 700;
+letter-spacing: -0.5px;
+color: var(–text);
+}
+.logo span { color: var(–accent); }
+
+.header-actions { display: flex; gap: 8px; }
+
+.icon-btn {
+background: var(–surface2);
+border: 1px solid var(–border);
+color: var(–muted);
+width: 36px; height: 36px;
+border-radius: 10px;
+display: flex; align-items: center; justify-content: center;
+cursor: pointer;
+transition: all 0.15s;
+font-size: 16px;
+}
+.icon-btn:hover, .icon-btn.active { color: var(–accent); border-color: var(–accent); }
+
+.tabs {
+display: flex;
+padding: 10px 18px 0;
+gap: 4px;
+border-bottom: 1px solid var(–border);
+background: var(–bg);
+flex-shrink: 0;
+overflow-x: auto;
+scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+padding: 7px 14px 9px;
+border-radius: 8px 8px 0 0;
+cursor: pointer;
+color: var(–muted);
+font-size: 12px;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+white-space: nowrap;
+border: 1px solid transparent;
+border-bottom: none;
+transition: all 0.15s;
+}
+.tab.active {
+background: var(–surface);
+color: var(–accent);
+border-color: var(–border);
+border-bottom: 1px solid var(–surface);
+margin-bottom: -1px;
+}
+
+.app-body {
+display: flex;
+flex: 1;
+overflow: hidden;
+}
+
+.sidebar {
+width: 260px;
+background: var(–surface);
+border-right: 1px solid var(–border);
+display: flex;
+flex-direction: column;
+flex-shrink: 0;
+overflow: hidden;
+}
+
+.sidebar-header {
+padding: 14px 14px 10px;
+display: flex;
+gap: 8px;
+align-items: center;
+}
+
+.search-box {
+flex: 1;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 7px 10px 7px 30px;
+color: var(–text);
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+outline: none;
+transition: border-color 0.15s;
+background-image: url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘14’ height=‘14’ viewBox=‘0 0 24 24’ fill=‘none’ stroke=’%237a6e8a’ stroke-width=‘2’%3E%3Ccircle cx=‘11’ cy=‘11’ r=‘8’/%3E%3Cpath d=‘m21 21-4.35-4.35’/%3E%3C/svg%3E”);
+background-repeat: no-repeat;
+background-position: 9px center;
+}
+.search-box:focus { border-color: var(–accent2); }
+.search-box::placeholder { color: var(–muted); }
+
+.new-song-btn {
+background: var(–accent);
+color: var(–bg);
+border: none;
+border-radius: 8px;
+width: 32px; height: 32px;
+font-size: 20px;
+cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+font-weight: 300;
+flex-shrink: 0;
+transition: opacity 0.15s;
+}
+.new-song-btn:hover { opacity: 0.85; }
+
+.song-list {
+flex: 1;
+overflow-y: auto;
+padding: 0 8px 8px;
+scrollbar-width: thin;
+scrollbar-color: var(–border) transparent;
+}
+
+.song-item {
+padding: 10px 10px;
+border-radius: 8px;
+cursor: pointer;
+transition: background 0.12s;
+border: 1px solid transparent;
+margin-bottom: 2px;
+}
+.song-item:hover { background: var(–surface2); }
+.song-item.active {
+background: var(–surface2);
+border-color: var(–border);
+}
+
+.song-item-title {
+font-family: ‘Playfair Display’, serif;
+font-size: 14px;
+color: var(–text);
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.song-item-meta {
+display: flex;
+gap: 6px;
+margin-top: 4px;
+align-items: center;
+flex-wrap: wrap;
+}
+
+.song-date { color: var(–muted); font-size: 10px; }
+
+.tag {
+font-size: 10px;
+padding: 1px 6px;
+border-radius: 4px;
+font-weight: 500;
+}
+.tag-verse { background: var(–tag1); color: var(–tag1b); }
+.tag-chorus { background: var(–tag2); color: var(–tag2b); }
+.tag-bridge { background: var(–tag3); color: var(–tag3b); }
+
+.editor-area {
+flex: 1;
+display: flex;
+flex-direction: column;
+overflow: hidden;
+background: var(–bg);
+}
+
+.editor-top {
+padding: 14px 18px 10px;
+border-bottom: 1px solid var(–border);
+display: flex;
+gap: 10px;
+align-items: flex-start;
+flex-shrink: 0;
+}
+
+.song-title-input {
+font-family: ‘Playfair Display’, serif;
+font-size: 22px;
+font-weight: 700;
+color: var(–text);
+background: transparent;
+border: none;
+outline: none;
+flex: 1;
+min-width: 0;
+caret-color: var(–accent);
+}
+.song-title-input::placeholder { color: var(–muted); }
+
+.editor-meta {
+padding: 8px 18px;
+display: flex;
+gap: 8px;
+align-items: center;
+flex-wrap: wrap;
+border-bottom: 1px solid var(–border);
+flex-shrink: 0;
+}
+
+.meta-chip {
+display: flex;
+align-items: center;
+gap: 5px;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 6px;
+padding: 4px 9px;
+font-size: 11px;
+color: var(–muted);
+cursor: pointer;
+transition: all 0.12s;
+}
+.meta-chip:hover { border-color: var(–muted); color: var(–text); }
+.meta-chip span { color: var(–accent); }
+
+.section-chips {
+display: flex;
+gap: 6px;
+padding: 8px 18px;
+border-bottom: 1px solid var(–border);
+overflow-x: auto;
+scrollbar-width: none;
+flex-shrink: 0;
+}
+.section-chips::-webkit-scrollbar { display: none; }
+
+.section-chip {
+font-size: 11px;
+padding: 4px 11px;
+border-radius: 20px;
+border: 1px solid var(–border);
+background: transparent;
+color: var(–muted);
+cursor: pointer;
+white-space: nowrap;
+transition: all 0.12s;
+font-family: ‘DM Mono’, monospace;
+letter-spacing: 0.3px;
+}
+.section-chip:hover { color: var(–text); border-color: var(–muted); }
+.section-chip.active-v { background: var(–tag1); color: var(–tag1b); border-color: var(–tag1b); }
+.section-chip.active-c { background: var(–tag2); color: var(–tag2b); border-color: var(–tag2b); }
+.section-chip.active-b { background: var(–tag3); color: var(–tag3b); border-color: var(–tag3b); }
+
+.lyric-editor {
+flex: 1;
+display: flex;
+flex-direction: column;
+overflow-y: auto;
+padding: 16px 18px;
+gap: 16px;
+scrollbar-width: thin;
+scrollbar-color: var(–border) transparent;
+}
+
+.lyric-section {
+display: flex;
+flex-direction: column;
+gap: 0;
+}
+
+.section-label {
+font-size: 10px;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 6px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.section-label::after {
+content: ‘’;
+flex: 1;
+height: 1px;
+background: var(–border);
+}
+
+.lyric-textarea {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 12px 14px;
+color: var(–text);
+font-family: ‘Playfair Display’, serif;
+font-size: 16px;
+line-height: 1.7;
+resize: none;
+outline: none;
+width: 100%;
+min-height: 90px;
+transition: border-color 0.15s;
+caret-color: var(–accent);
+overflow: hidden;
+}
+.lyric-textarea:focus { border-color: var(–accent2); }
+.lyric-textarea::placeholder { color: var(–border); font-style: italic; }
+
+.bottom-bar {
+padding: 10px 18px;
+border-top: 1px solid var(–border);
+display: flex;
+gap: 8px;
+align-items: center;
+flex-shrink: 0;
+background: var(–bg);
+}
+
+.wordcount { color: var(–muted); font-size: 11px; flex: 1; }
+
+.btn {
+padding: 7px 16px;
+border-radius: 8px;
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+cursor: pointer;
+border: none;
+transition: all 0.15s;
+letter-spacing: 0.3px;
+}
+
+.btn-primary {
+background: var(–accent);
+color: var(–bg);
+font-weight: 500;
+}
+.btn-primary:hover { opacity: 0.88; }
+
+.btn-ghost {
+background: var(–surface2);
+border: 1px solid var(–border);
+color: var(–muted);
+}
+.btn-ghost:hover { color: var(–text); border-color: var(–muted); }
+
+.rhyme-panel {
+width: 220px;
+background: var(–surface);
+border-left: 1px solid var(–border);
+display: flex;
+flex-direction: column;
+flex-shrink: 0;
+overflow: hidden;
+}
+
+.panel-header {
+padding: 14px 14px 10px;
+font-size: 11px;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–muted);
+border-bottom: 1px solid var(–border);
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+
+.rhyme-input-row {
+padding: 10px 12px;
+display: flex;
+gap: 6px;
+}
+
+.rhyme-input {
+flex: 1;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 7px;
+padding: 6px 9px;
+color: var(–text);
+font-family: ‘DM Mono’, monospace;
+font-size: 12px;
+outline: none;
+}
+.rhyme-input:focus { border-color: var(–accent2); }
+
+.rhyme-find-btn {
+background: var(–accent2);
+border: none;
+border-radius: 7px;
+color: white;
+padding: 6px 10px;
+font-size: 11px;
+cursor: pointer;
+font-family: ‘DM Mono’, monospace;
+transition: opacity 0.15s;
+}
+.rhyme-find-btn:hover { opacity: 0.85; }
+
+.rhyme-results {
+flex: 1;
+overflow-y: auto;
+padding: 4px 12px 12px;
+scrollbar-width: thin;
+scrollbar-color: var(–border) transparent;
+}
+
+.rhyme-group { margin-bottom: 14px; }
+
+.rhyme-group-label {
+font-size: 10px;
+letter-spacing: 1.5px;
+color: var(–muted);
+text-transform: uppercase;
+margin-bottom: 6px;
+}
+
+.rhyme-words {
+display: flex;
+flex-wrap: wrap;
+gap: 5px;
+}
+
+.rhyme-word {
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 5px;
+padding: 3px 9px;
+font-size: 12px;
+cursor: pointer;
+transition: all 0.12s;
+color: var(–text);
+}
+.rhyme-word:hover {
+background: var(–accent2);
+border-color: var(–accent2);
+color: white;
+}
+
+.empty-state {
+flex: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+color: var(–muted);
+gap: 10px;
+padding: 40px;
+text-align: center;
+}
+.empty-state-icon { font-size: 40px; opacity: 0.4; }
+.empty-state h3 { font-family: ‘Playfair Display’, serif; font-size: 18px; color: var(–muted); font-weight: 400; }
+.empty-state p { font-size: 12px; line-height: 1.6; max-width: 220px; }
+
+.mobile-nav {
+display: none;
+padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+background: var(–surface);
+border-top: 1px solid var(–border);
+flex-shrink: 0;
+}
+
+.mobile-nav-inner {
+display: flex;
+justify-content: space-around;
+}
+
+.mobile-nav-btn {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 3px;
+padding: 6px 20px;
+color: var(–muted);
+cursor: pointer;
+transition: color 0.12s;
+border: none;
+background: none;
+font-family: ‘DM Mono’, monospace;
+}
+.mobile-nav-btn.active { color: var(–accent); }
+.mobile-nav-btn svg { width: 22px; height: 22px; }
+.mobile-nav-btn span { font-size: 9px; letter-spacing: 0.5px; }
+
+.modal-overlay {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.7);
+z-index: 100;
+align-items: flex-end;
+justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 16px 16px 0 0;
+padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+width: 100%;
+max-width: 500px;
+animation: slideUp 0.22s ease;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal-title {
+font-family: ‘Playfair Display’, serif;
+font-size: 17px;
+margin-bottom: 14px;
+color: var(–text);
+}
+
+.modal-input {
+width: 100%;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 10px 12px;
+color: var(–text);
+font-family: ‘DM Mono’, monospace;
+font-size: 14px;
+outline: none;
+margin-bottom: 14px;
+}
+.modal-input:focus { border-color: var(–accent); }
+
+.modal-row { display: flex; gap: 8px; justify-content: flex-end; }
+
+@media (max-width: 768px) {
+.sidebar { display: none; width: 100%; }
+.sidebar.mobile-visible { display: flex; position: fixed; inset: 0; top: 56px; z-index: 50; width: 100%; border-right: none; }
+.rhyme-panel { display: none; }
+.rhyme-panel.mobile-visible { display: flex; position: fixed; inset: 0; top: 56px; z-index: 50; width: 100%; border-left: none; }
+.mobile-nav { display: block; }
+.app-body { overflow: visible; }
+.editor-area { display: none; }
+.editor-area.mobile-visible { display: flex; position: fixed; inset: 0; top: 56px; z-index: 48; width: 100%; }
+}
+
+@media (max-width: 900px) and (min-width: 769px) {
+.rhyme-panel { width: 180px; }
+.sidebar { width: 200px; }
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(–border); border-radius: 2px; }
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="logo">Lyriq<span>.</span></div>
+  <div class="header-actions">
+    <button class="icon-btn" id="themeToggle" title="Toggle theme">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <button class="icon-btn" title="Settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 1.07 13.5l-1.5-1.5A8 8 0 1 0 5 17l-1.5 1.5A10 10 0 0 1 4.93 4.93"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active">All Songs</div>
+  <div class="tab">Drafts</div>
+  <div class="tab">Completed</div>
+  <div class="tab">Archived</div>
+</div>
+
+<div class="app-body">
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <input class="search-box" type="text" placeholder="Search songs..." id="searchInput">
+      <button class="new-song-btn" id="newSongBtn" title="New song">+</button>
+    </div>
+    <div class="song-list" id="songList"></div>
+  </div>
+
+  <div class="editor-area" id="editorArea">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-state-icon">♪</div>
+      <h3>No song selected</h3>
+      <p>Pick a song from the list, or tap + to start writing something new.</p>
+    </div>
+    <div id="editorContent" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+      <div class="editor-top">
+        <input class="song-title-input" id="songTitleInput" placeholder="Untitled Song" type="text">
+      </div>
+      <div class="editor-meta">
+        <div class="meta-chip"><span id="keyDisplay">Am</span> Key</div>
+        <div class="meta-chip"><span id="tempoDisplay">92</span> BPM</div>
+        <div class="meta-chip"><span id="genreDisplay">Indie</span></div>
+        <div class="meta-chip" id="addMetaBtn">+ add</div>
+      </div>
+      <div class="section-chips" id="sectionChips"></div>
+      <div class="lyric-editor" id="lyricEditor"></div>
+      <div class="bottom-bar">
+        <div class="wordcount" id="wordcount">0 words · 0 lines</div>
+        <button class="btn btn-ghost" onclick="exportSong()">Export</button>
+        <button class="btn btn-primary" onclick="saveSong()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="rhyme-panel" id="rhymePanel">
+    <div class="panel-header">
+      <span>Rhyme Finder</span>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+    <div class="rhyme-input-row">
+      <input class="rhyme-input" id="rhymeInput" placeholder="word..." type="text">
+      <button class="rhyme-find-btn" onclick="findRhymes()">Find</button>
+    </div>
+    <div class="rhyme-results" id="rhymeResults">
+      <div style="color:var(--muted);font-size:11px;padding:4px 0;line-height:1.8;">
+        Type a word and hit Find to discover rhymes, near-rhymes, and syllable matches.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mobile-nav-btn active" id="navSongs" onclick="mobileNav('songs')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      <span>Songs</span>
+    </button>
+    <button class="mobile-nav-btn" id="navEditor" onclick="mobileNav('editor')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      <span>Write</span>
+    </button>
+    <button class="mobile-nav-btn" id="navRhyme" onclick="mobileNav('rhyme')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+      <span>Rhymes</span>
+    </button>
+  </div>
+</nav>
+
+<div class="modal-overlay" id="newSongModal">
+  <div class="modal">
+    <div class="modal-title">New Song</div>
+    <input class="modal-input" id="newSongTitle" placeholder="Song title..." type="text">
+    <div class="modal-row">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="createSong()">Create</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let songs = [
+  {
+    id: 1,
+    title: "Shallow Waters",
+    key: "Em", bpm: 78, genre: "Folk", date: "Apr 3",
+    sections: [
+      { id: "verse1", label: "Verse 1", type: "verse", content: "Standing at the edge of something older\nThe sky unravels at the seam\nI've been carrying this stone on my shoulder\nWaiting for a sign to let it be" },
+      { id: "chorus", label: "Chorus", type: "chorus", content: "We're all just wading through shallow waters\nSearching for a depth we've never known\nLike desperate sons and restless daughters\nBuilding broken bridges back to home" },
+      { id: "verse2", label: "Verse 2", type: "verse", content: "The morning pulls a thread through the curtain\nGold and slow and merciful and low\nNothing in this life is ever certain\nBut the way the river learns to flow" },
+      { id: "bridge", label: "Bridge", type: "bridge", content: "Maybe we were always meant to wander\nMaybe this was always where we'd end\nLet the distance make the heart grow fonder\nLet the breaking be the way we mend" }
+    ]
+  },
+  {
+    id: 2,
+    title: "Neon Midnight",
+    key: "Dm", bpm: 112, genre: "Synthpop", date: "Mar 28",
+    sections: [
+      { id: "verse1", label: "Verse 1", type: "verse", content: "Electric signs bleed into the rain\nYou left your jacket I can't explain\nThe city hums a frequency of pain" },
+      { id: "chorus", label: "Chorus", type: "chorus", content: "Neon midnight, neon midnight\nWe were burning, burning bright\nNeon midnight, neon midnight\nLost in colour, lost in light" },
+      { id: "bridge", label: "Bridge", type: "bridge", content: "Circuits in my chest where the love used to live\nSignals in the static, nothing left to give" }
+    ]
+  },
+  {
+    id: 3,
+    title: "Sunday Drift",
+    key: "G", bpm: 65, genre: "R&B", date: "Mar 21",
+    sections: [
+      { id: "verse1", label: "Verse 1", type: "verse", content: "Coffee getting cold on the windowsill\nYour name still warm inside my mouth\nThe kind of quiet nothing else can fill\nLazy Sunday drifting south" },
+      { id: "chorus", label: "Chorus", type: "chorus", content: "Sunday drift, Sunday drift\nTime moves slow when you're in my arms\nSunday drift, Sunday drift\nWrap me in your Sunday charms" }
+    ]
+  },
+  {
+    id: 4,
+    title: "Cartography",
+    key: "C", bpm: 88, genre: "Indie", date: "Mar 15",
+    sections: [
+      { id: "verse1", label: "Verse 1", type: "verse", content: "I've been drawing maps of you in my sleep\nEvery scar a coastline, every silence deep\nMeridians of memory that I can't keep" }
+    ]
+  }
+];
+
+let activeSongId = null;
+let mobileView = 'songs';
+let sectionCounts = {};
+
+const rhymeDB = {
+  "love": { perfect: ["above","dove","shove","glove"], near: ["of","have","alive","thrive"], slant: ["enough","tough","rough","bluff"] },
+  "night": { perfect: ["light","bright","right","sight","might","fight","tight","white","write","kite"], near: ["lie","sky","alive","guide"], slant: ["knit","wait","late","fate"] },
+  "rain": { perfect: ["pain","gain","lane","plain","brain","train","chain","stain","vain","main"], near: ["ran","name","flame","same"], slant: ["end","wind","friend","blend"] },
+  "home": { perfect: ["foam","roam","dome","rome","chrome","poem","tome"], near: ["alone","bone","stone","phone"], slant: ["hold","cold","soul","whole"] },
+  "away": { perfect: ["day","say","stay","play","way","may","gray","pray","sway","bay"], near: ["fade","made","shade","trade"], slant: ["end","bend","send","friend"] },
+  "heart": { perfect: ["start","art","part","chart","smart","dart","apart"], near: ["hard","yard","guard","scars"], slant: ["path","half","last","past"] },
+  "sky": { perfect: ["fly","high","lie","die","try","cry","why","my","by"], near: ["side","ride","guide","wide"], slant: ["light","night","bright","right"] },
+  "time": { perfect: ["rhyme","climb","dime","lime","mime","prime"], near: ["mind","find","blind","kind"], slant: ["line","mine","fine","divine"] },
+  "fire": { perfect: ["higher","desire","entire","inspire","admire"], near: ["bright","night","light","fight"], slant: ["wild","child","mild","riled"] },
+  "cold": { perfect: ["bold","hold","told","fold","gold","old","sold","rolled"], near: ["soul","whole","goal","role"], slant: ["fall","call","wall","hall"] }
+};
+
+function findRhymes() {
+  const word = document.getElementById('rhymeInput').value.trim().toLowerCase();
+  const res = document.getElementById('rhymeResults');
+  if (!word) return;
+  let data = rhymeDB[word];
+  if (!data) {
+    const ending = word.slice(-2);
+    const map = {
+      "ay": ["say","way","day","play","stay","pray"],
+      "ht": ["light","night","bright","right","fight"],
+      "ve": ["love","dove","shove","above"],
+      "ng": ["song","long","strong","along"],
+      "ee": ["free","tree","see","be","me","sea"]
+    };
+    data = {
+      perfect: map[ending] || ["dream","stream","gleam","seem","team","beam"],
+      near: ["echo","hollow","follow","meadow","shadow","narrow","borrow"],
+      slant: ["echo","shadow","hollow","sorrow"]
+    };
+  }
+  res.innerHTML = ['perfect','near','slant'].map(type => `
+    <div class="rhyme-group">
+      <div class="rhyme-group-label">${type}</div>
+      <div class="rhyme-words">${data[type].map(w => `<div class="rhyme-word" onclick="insertWord('${w}')">${w}</div>`).join('')}</div>
+    </div>`).join('');
+}
+
+function insertWord(w) {
+  const focused = document.activeElement;
+  if (focused && focused.classList.contains('lyric-textarea')) {
+    const start = focused.selectionStart;
+    const val = focused.value;
+    focused.value = val.slice(0, start) + w + val.slice(focused.selectionEnd);
+    focused.selectionStart = focused.selectionEnd = start + w.length;
+    focused.focus();
+  }
+}
+
+document.getElementById('rhymeInput').addEventListener('keydown', e => { if (e.key === 'Enter') findRhymes(); });
+
+function renderSongList(filter = '') {
+  const list = document.getElementById('songList');
+  const filtered = songs.filter(s => s.title.toLowerCase().includes(filter.toLowerCase()));
+  list.innerHTML = filtered.map(s => {
+    const types = [...new Set(s.sections.map(sec => sec.type))];
+    const tags = types.slice(0,2).map(t => `<span class="tag tag-${t}">${t}</span>`).join('');
+    return `<div class="song-item ${activeSongId === s.id ? 'active' : ''}" onclick="openSong(${s.id})">
+      <div class="song-item-title">${s.title}</div>
+      <div class="song-item-meta"><span class="song-date">${s.date}</span>${tags}</div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('searchInput').addEventListener('input', e => renderSongList(e.target.value));
+
+function openSong(id) {
+  activeSongId = id;
+  const song = songs.find(s => s.id === id);
+  document.getElementById('emptyState').style.display = 'none';
+  const ec = document.getElementById('editorContent');
+  ec.style.display = 'flex';
+  ec.style.flexDirection = 'column';
+  ec.style.overflow = 'hidden';
+  ec.style.flex = '1';
+  document.getElementById('songTitleInput').value = song.title;
+  document.getElementById('keyDisplay').textContent = song.key;
+  document.getElementById('tempoDisplay').textContent = song.bpm;
+  document.getElementById('genreDisplay').textContent = song.genre;
+  renderSections(song);
+  renderSongList();
+  updateWordCount();
+  if (window.innerWidth <= 768) mobileNav('editor');
+}
+
+function renderSections(song) {
+  const editor = document.getElementById('lyricEditor');
+  editor.innerHTML = song.sections.map(sec => `
+    <div class="lyric-section" id="sec-${sec.id}">
+      <div class="section-label">${sec.label}</div>
+      <textarea class="lyric-textarea" data-section="${sec.id}" placeholder="Write your ${sec.label.toLowerCase()} here..."
+        oninput="autoResize(this);updateWordCount()">${sec.content}</textarea>
+
+```
+</div>`).join('');
+```
+
+const chips = document.getElementById(‘sectionChips’);
+chips.innerHTML = song.sections.map(sec => {
+const cls = sec.type === ‘chorus’ ? ‘active-c’ : sec.type === ‘bridge’ ? ‘active-b’ : ‘active-v’;
+return `<button class="section-chip ${cls}" onclick="scrollToSection('${sec.id}')">${sec.label}</button>`;
+}).join(’’) + `<button class="section-chip" onclick="addSection()">+ Section</button>`;
+
+setTimeout(() => document.querySelectorAll(’.lyric-textarea’).forEach(ta => autoResize(ta)), 50);
+}
+
+function autoResize(el) {
+el.style.height = ‘auto’;
+el.style.height = Math.max(90, el.scrollHeight) + ‘px’;
+}
+
+function scrollToSection(id) {
+const el = document.getElementById(‘sec-’ + id);
+if (el) el.scrollIntoView({ behavior: ‘smooth’, block: ‘start’ });
+}
+
+function updateWordCount() {
+if (!activeSongId) return;
+let words = 0, lines = 0;
+document.querySelectorAll(’.lyric-textarea’).forEach(ta => {
+words += ta.value.split(/\s+/).filter(w => w.length > 0).length;
+lines += ta.value.split(’\n’).filter(l => l.trim()).length;
+});
+document.getElementById(‘wordcount’).textContent = `${words} words · ${lines} lines`;
+}
+
+const sectionTypes = [‘Verse’,‘Chorus’,‘Bridge’,‘Pre-Chorus’,‘Outro’,‘Intro’,‘Hook’];
+
+function addSection() {
+if (!activeSongId) return;
+const song = songs.find(s => s.id === activeSongId);
+const label = sectionTypes[Math.floor(Math.random() * 3)];
+sectionCounts[label] = (sectionCounts[label] || 0) + 1;
+const fullLabel = `${label} ${sectionCounts[label] + 1}`;
+const type = label.toLowerCase().replace(’-’,’’);
+const id = label.toLowerCase() + Date.now();
+song.sections.push({
+id,
+label: fullLabel,
+type: type.includes(‘chorus’) ? ‘chorus’ : type.includes(‘bridge’) ? ‘bridge’ : ‘verse’,
+content: ‘’
+});
+renderSections(song);
+setTimeout(() => scrollToSection(id), 100);
+}
+
+function saveSong() {
+if (!activeSongId) return;
+const song = songs.find(s => s.id === activeSongId);
+song.title = document.getElementById(‘songTitleInput’).value || ‘Untitled’;
+document.querySelectorAll(’.lyric-textarea’).forEach(ta => {
+const sec = song.sections.find(s => s.id === ta.dataset.section);
+if (sec) sec.content = ta.value;
+});
+renderSongList();
+const btn = event.target;
+const orig = btn.textContent;
+btn.textContent = ‘✓ Saved’;
+btn.style.background = ‘#4caf82’;
+setTimeout(() => { btn.textContent = orig; btn.style.background = ‘’; }, 1200);
+}
+
+function exportSong() {
+if (!activeSongId) return;
+const song = songs.find(s => s.id === activeSongId);
+let out = `${song.title}\n${'─'.repeat(song.title.length)}\nKey: ${song.key} · ${song.bpm} BPM · ${song.genre}\n\n`;
+song.sections.forEach(sec => { out += `[ ${sec.label.toUpperCase()} ]\n${sec.content}\n\n`; });
+const a = document.createElement(‘a’);
+a.href = URL.createObjectURL(new Blob([out], { type: ‘text/plain’ }));
+a.download = `${song.title.replace(/\s+/g,'_')}.txt`;
+a.click();
+}
+
+document.getElementById(‘newSongBtn’).addEventListener(‘click’, () => {
+document.getElementById(‘newSongModal’).classList.add(‘open’);
+setTimeout(() => document.getElementById(‘newSongTitle’).focus(), 100);
+});
+
+function closeModal() {
+document.getElementById(‘newSongModal’).classList.remove(‘open’);
+document.getElementById(‘newSongTitle’).value = ‘’;
+}
+
+document.getElementById(‘newSongTitle’).addEventListener(‘keydown’, e => { if (e.key === ‘Enter’) createSong(); });
+
+function createSong() {
+const title = document.getElementById(‘newSongTitle’).value.trim() || ‘Untitled’;
+const newSong = {
+id: Date.now(), title, key: ‘C’, bpm: 90, genre: ‘Pop’, date: ‘Today’,
+sections: [
+{ id: ‘verse1’, label: ‘Verse 1’, type: ‘verse’, content: ‘’ },
+{ id: ‘chorus’, label: ‘Chorus’, type: ‘chorus’, content: ‘’ }
+]
+};
+songs.unshift(newSong);
+closeModal();
+renderSongList();
+openSong(newSong.id);
+}
+
+document.getElementById(‘newSongModal’).addEventListener(‘click’, e => { if (e.target === e.currentTarget) closeModal(); });
+
+function mobileNav(view) {
+if (window.innerWidth > 768) return;
+mobileView = view;
+document.getElementById(‘sidebar’).classList.remove(‘mobile-visible’);
+document.getElementById(‘editorArea’).classList.remove(‘mobile-visible’);
+document.getElementById(‘rhymePanel’).classList.remove(‘mobile-visible’);
+[‘navSongs’,‘navEditor’,‘navRhyme’].forEach(id => document.getElementById(id).classList.remove(‘active’));
+if (view === ‘songs’) {
+document.getElementById(‘sidebar’).classList.add(‘mobile-visible’);
+document.getElementById(‘navSongs’).classList.add(‘active’);
+} else if (view === ‘editor’) {
+document.getElementById(‘editorArea’).classList.add(‘mobile-visible’);
+document.getElementById(‘navEditor’).classList.add(‘active’);
+} else if (view === ‘rhyme’) {
+document.getElementById(‘rhymePanel’).classList.add(‘mobile-visible’);
+document.getElementById(‘navRhyme’).classList.add(‘active’);
+}
+}
+
+renderSongList();
+if (window.innerWidth > 768) openSong(songs[0].id);
+else document.getElementById(‘sidebar’).classList.add(‘mobile-visible’);
+
+document.querySelectorAll(’.tab’).forEach(tab => {
+tab.addEventListener(‘click’, function() {
+document.querySelectorAll(’.tab’).forEach(t => t.classList.remove(‘active’));
+this.classList.add(‘active’);
+});
+});
+
+document.getElementById(‘songTitleInput’).addEventListener(‘input’, function() {
+if (activeSongId) {
+songs.find(s => s.id === activeSongId).title = this.value;
+renderSongList();
+}
+});
+</script>
+
+</body>
+</html>
